@@ -6,7 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
@@ -132,12 +130,13 @@ fun user_input() {
 
 @Composable
 fun MasterMind() {
-    val navController = rememberNavController()
-    NavHost(navController, startDestination = "HomeScreen") {
-        composable("HomeScreen") {HomeScreen(navController)}
+    val nav_Controller = rememberNavController()
+    NavHost(nav_Controller, startDestination = "HomeScreen") {
+        composable("HomeScreen") {HomeScreen(nav_Controller)}
         composable("GameScreen") { GameScreen() }
     }
 }
+
 
 @Composable
 fun HomeScreen(navController: NavController) {
@@ -150,6 +149,7 @@ fun HomeScreen(navController: NavController) {
 @Composable
 fun GameScreen() {
     val fruits_to_guess = set_combination()
+
     Column {
         for (fruit in fruits_to_guess)
         {
