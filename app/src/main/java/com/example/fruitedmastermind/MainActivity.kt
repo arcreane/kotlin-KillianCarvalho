@@ -92,6 +92,45 @@ fun check_combination(guess_combination:List<String>, user_combination: List<Str
 }
 
 @Composable
+fun user_input() {
+    var proposition: MutableList<String>
+    var showDialog by remember { mutableStateOf(false) }
+    var selectedCell by remember { mutableStateOf(0) }
+
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+        for (i in 0 until 4) {
+            Button(onClick = {
+                selectedCell = i
+                showDialog = true
+                println("case cliquable")
+            }){}
+        }
+        Button(onClick = { println("case cliquable") }){
+            Text(text = "Send")
+            var modifier = Modifier
+                .border(border = BorderStroke(width = 1.dp, Color.LightGray))
+                .height(70.dp)
+        }
+    }
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text(text = "Cellule $selectedCell")},
+            text = {
+                Column {
+                    for (fruit in fruits) {
+                        Button(onClick = { println("$fruit") }) {
+                            Text(text = "$fruit")
+                        }
+                    }
+                }
+            },
+            confirmButton = {  }
+        )
+    }
+}
+
+@Composable
 fun MasterMind() {
     val navController = rememberNavController()
     NavHost(navController, startDestination = "HomeScreen") {
