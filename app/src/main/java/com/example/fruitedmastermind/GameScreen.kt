@@ -31,7 +31,7 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
     var showDialog by remember { mutableStateOf(false) }
     var selectedCell by remember { mutableStateOf(0) }
     var currentGuess by remember { mutableStateOf(MutableList(4) { Fruit("", false, false, 0) }) }
-    viewModel.start_game()
+
     Column {
         for (fruit in viewModel.combination_to_guess.value!!)
         {

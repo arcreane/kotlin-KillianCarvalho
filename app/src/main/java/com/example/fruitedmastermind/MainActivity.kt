@@ -14,10 +14,11 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val nav_Controller = rememberNavController()
+            val viewModel = GameViewModel()
 
             NavHost(nav_Controller, startDestination = "home") {
-                composable("home") {Home_screen(nav_Controller)}
-                composable("game") { GameScreen(viewModel = GameViewModel(), navController = nav_Controller)}
+                composable("home") {Home_screen(viewModel = viewModel, nav_Controller)}
+                composable("game") { GameScreen(viewModel = viewModel, navController = nav_Controller)}
             }
        }
     }

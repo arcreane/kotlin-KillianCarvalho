@@ -1,0 +1,50 @@
+[
+  {
+    "name": "banana",
+    "has_seeds": false,
+    "is_peelable": true,
+    "image": "banana"
+  },
+  {
+    "name": "grape",
+    "has_seeds": true,
+    "is_peelable": false,
+    "image": "grape"
+  },
+  {
+    "name": "kiwi",
+    "has_seeds": false,
+    "is_peelable": true,
+    "image": "kiwi"
+  },
+  {
+    "name": "lemon",
+    "has_seeds": true,
+    "is_peelable": true,
+    "image": "lemon"
+  },
+  {
+    "name": "orange",
+    "has_seeds": true,
+    "is_peelable": true,
+    "image": "orange"
+  },
+  {
+    "name": "prune",
+    "has_seeds": true,
+    "is_peelable": false,
+    "image": "prune"
+  },
+  {
+    "name": "raspberry",
+    "has_seeds": false,
+    "is_peelable": false,
+    "image": "raspberry"
+  },
+  {
+    "name": "strawberry",
+    "has_seeds": false,
+    "is_peelable": false,
+    "image": "strawberry"
+  }
+]
