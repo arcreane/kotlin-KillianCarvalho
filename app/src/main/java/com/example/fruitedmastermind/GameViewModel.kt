@@ -34,15 +34,27 @@ class GameViewModel : ViewModel() {
     private val _score = MutableLiveData<Int>()
     val score = _score
 
+    // combination history
+    private val _guess_history = MutableLiveData<List<List<Fruit>>>(emptyList())
+    val guess_history = _guess_history
+
+    // combination result history
+    private val _result_history = MutableLiveData<List<List<Char>>>(emptyList())
+    val result_history = _result_history
+
     fun start_game(){
         _combination_to_guess.value = set_combination(_all_fruits)
-        _remaining_attempts.value = 0
+        _remaining_attempts.value = 10
         _score.value = 0
     }
 
     fun make_guess(guess: List<Fruit>){
         // check the answer of the user
         var answer_check = check_combination(guess)
+
+        // keep the history
+        _guess_history.value = _guess_history.value?.plus(listOf(guess))
+        _result_history.value = _result_history.value?.plus(listOf(answer_check))
 
         // left one attempts to the user
         _remaining_attempts.value = (_remaining_attempts.value ?: 0) -1
