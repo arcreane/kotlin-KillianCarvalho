@@ -16,6 +16,7 @@ class GameViewModel : ViewModel() {
         Fruit("raspberry", false, false, R.drawable.raspberry),
         Fruit("strawberry", false, false, R.drawable.strawberry),
     )
+    val all_fruits: List<Fruit> = _all_fruits
 
     // combination of fruits to guess
     private val _combination_to_guess = MutableLiveData<List<Fruit>>()
