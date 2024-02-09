@@ -42,6 +42,9 @@ class GameViewModel : ViewModel() {
     private val _result_history = MutableLiveData<List<List<Char>>>(emptyList())
     val result_history = _result_history
 
+    private val _win = MutableLiveData<Boolean>()
+    val win = _win
+
     fun start_game(){
         _combination_to_guess.value = set_combination(_all_fruits)
         _remaining_attempts.value = 10
@@ -60,8 +63,37 @@ class GameViewModel : ViewModel() {
         _remaining_attempts.value = (_remaining_attempts.value ?: 0) -1
 
         // if all the value is '1' the game is end and we ask to play again
-        if (answer_check.all {it == '1'})
-            start_game()
+        if (answer_check.all {it == '1'}){
+            _score.value = _remaining_attempts.value
+            _win.value = true
+        }
+    }
+
+    // give hint link to the seeds variable
+    fun giveFirstHint(): List<Boolean> {
+        val combination = _combination_to_guess.value ?: emptyList()
+        _remaining_attempts.value = _remaining_attempts.value!! - 2
+        return combination.map { fruit ->
+            if (fruit.has_seeds) {
+                true
+            } else {
+                false
+            }
+        }
+    }
+
+    // give hint link to the peelable variable
+    fun giveSecondHint(): List<Boolean> {
+        val combination = _combination_to_guess.value ?: emptyList()
+        _remaining_attempts.value = _remaining_attempts.value!! - 3
+
+        return combination.map { fruit ->
+            if (fruit.is_peelable) {
+                true
+            } else {
+                false
+            }
+        }
     }
 
     private fun set_combination(fruits: List<Fruit>): List<Fruit> {

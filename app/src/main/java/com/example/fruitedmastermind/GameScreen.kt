@@ -27,6 +27,8 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -40,7 +42,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -55,30 +56,30 @@ import androidx.navigation.NavController
 @Composable
 fun GameScreen(viewModel: GameViewModel, navController: NavController) {
     val showDialog = remember { mutableStateOf(false) }
+    val showWin = remember { mutableStateOf(false) }
+    val showLoose = remember { mutableStateOf(false) }
     val selectedCell = remember { mutableStateOf(0) }
     val currentGuess = remember { mutableStateOf(MutableList(4) { Fruit("", false, false, 0) }) }
     val remainingAttempts by viewModel.remaining_attempts.observeAsState()
     val guessHistory by viewModel.guess_history.observeAsState(emptyList())
     val resultHistory by viewModel.result_history.observeAsState(emptyList())
+    var showMenu by remember { mutableStateOf(false) }
+    val has_win by viewModel.win.observeAsState()
+    val score by viewModel.score.observeAsState()
 
-    var presses by remember { mutableIntStateOf(0) }
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                colors = topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-                navigationIcon = {
-                    IconButton(onClick = { navController.navigate("home") }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Retour")
-                    }
-                },
-                title = {
-                    Text("MasterMind")
+            TopAppBar(colors = topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                titleContentColor = MaterialTheme.colorScheme.primary,
+            ), navigationIcon = {
+                IconButton(onClick = { navController.navigate("home") }) {
+                    Icon(Icons.Filled.ArrowBack, contentDescription = "Retour")
                 }
-            )
+            }, title = {
+                Text("MasterMind")
+            })
         },
         bottomBar = {
             BottomAppBar(
@@ -96,20 +97,46 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
             }
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { presses++ }) {
-                Icon(Icons.Default.Add, contentDescription = "Add")
+            Column {
+                FloatingActionButton(onClick = { showMenu = true }) {
+                    Icon(Icons.Default.Add, contentDescription = "Add")
+                }
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false },
+
+                    ) {
+                    DropdownMenuItem(text = { Text("First hint -2 attempts") },
+                        onClick = { viewModel.giveFirstHint() })
+                    DropdownMenuItem(text = { Text("First hint -3 attempts") },
+                        onClick = { viewModel.giveSecondHint() })
+                }
             }
-        }
+
+        },
     ) { innerPadding ->
+        if (remainingAttempts!! <= 0) {
+            AlertDialogLoose(viewModel = viewModel, showLoose = showLoose)
+        }
+        if (has_win == true) AlertDialogWin(
+            viewModel = viewModel,
+            showWin = showWin,
+            score = score
+        )
         Column(
-            modifier = Modifier
-                .padding(innerPadding),
+            modifier = Modifier.padding(innerPadding),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = "Tentative left: $remainingAttempts")
+        }
+        Column(
+            modifier = Modifier.padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             HistoryDisplay(guessHistory = guessHistory, resultHistory)
         }
     }
-
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -119,12 +146,13 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
             AlertDialogGuess(
                 viewModel = viewModel,
                 currentGuess = currentGuess,
-                showDialog = showDialog,
+                showWin = showDialog,
                 selectedCell = selectedCell
             )
         }
     }
 }
+
 
 // composable to manage the choice of the user
 @Composable
@@ -144,17 +172,14 @@ fun InputRow(
                     .clickable {
                         showDialog.value = true
                         selectedCell.value = i
-                    },
-                contentAlignment = Alignment.Center
+                    }, contentAlignment = Alignment.Center
             ) {
-                if (currentGuess.value[i].name == "")
-                    Text(text = currentGuess.value[i].name)
-                else
-                    Image(
-                        painter = painterResource(currentGuess.value[i].image),
-                        contentDescription = currentGuess.value[i].name,
-                        modifier = Modifier.size(50.dp)
-                    )
+                if (currentGuess.value[i].name == "") Text(text = currentGuess.value[i].name)
+                else Image(
+                    painter = painterResource(currentGuess.value[i].image),
+                    contentDescription = currentGuess.value[i].name,
+                    modifier = Modifier.size(50.dp)
+                )
             }
         }
         Button(onClick = {
@@ -191,24 +216,21 @@ fun HistoryRow(fruitList: List<Fruit>, resultList: List<List<Char>>, index: Int)
             )
         }
         for (result in resultList[index]) {
-            if (result == '1')
-                Image(
-                    painter = painterResource(id = R.drawable.good_balise),
-                    contentDescription = "good place",
-                    modifier = Modifier.size(25.dp)
-                )
-            else if (result == '0')
-                Image(
-                    painter = painterResource(id = R.drawable.bad_balise),
-                    contentDescription = "good place",
-                    modifier = Modifier.size(25.dp)
-                )
-            else
-                Image(
-                    painter = painterResource(id = R.drawable.none_balise),
-                    contentDescription = "good place",
-                    modifier = Modifier.size(25.dp)
-                )
+            if (result == '1') Image(
+                painter = painterResource(id = R.drawable.good_balise),
+                contentDescription = "good place",
+                modifier = Modifier.size(25.dp)
+            )
+            else if (result == '0') Image(
+                painter = painterResource(id = R.drawable.bad_balise),
+                contentDescription = "good place",
+                modifier = Modifier.size(25.dp)
+            )
+            else Image(
+                painter = painterResource(id = R.drawable.none_balise),
+                contentDescription = "good place",
+                modifier = Modifier.size(25.dp)
+            )
         }
     }
 }
@@ -218,33 +240,101 @@ fun HistoryRow(fruitList: List<Fruit>, resultList: List<List<Char>>, index: Int)
 fun AlertDialogGuess(
     viewModel: GameViewModel,
     currentGuess: MutableState<MutableList<Fruit>>,
-    showDialog: MutableState<Boolean>,
+    showWin: MutableState<Boolean>,
     selectedCell: MutableState<Int>
 ) {
-    AlertDialog(
-        onDismissRequest = { showDialog.value = false },
-        title = { Text(text = "Choose a fruit") },
+    AlertDialog(onDismissRequest = { showWin.value = false },
+        title = { Text(text = "CHOOSE A FRUIT") },
         text = {
             LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                contentPadding = PaddingValues(20.dp)
+                columns = GridCells.Fixed(3), contentPadding = PaddingValues(20.dp)
             ) {
                 items(viewModel.all_fruits) { fruit ->
-                    Image(
-                        painter = painterResource(id = fruit.image),
+                    Image(painter = painterResource(id = fruit.image),
                         contentDescription = "good place",
                         modifier = Modifier
                             .size(90.dp)
                             .padding(10.dp)
                             .clickable {
                                 currentGuess.value[selectedCell.value] = fruit
-                                showDialog.value = false
-                            }
-                    )
+                                showWin.value = false
+                            })
                     Spacer(modifier = Modifier.height(20.dp))
                 }
             }
         },
-        confirmButton = { }
-    )
+        confirmButton = { })
+}
+
+@Composable
+fun AlertDialogWin(
+    viewModel: GameViewModel,
+    showWin: MutableState<Boolean>,
+    score: Int?
+) {
+    AlertDialog(onDismissRequest = { showWin.value = false },
+        title = { Text(text = "YOU HAVE WIN") },
+        text = {
+            Column {
+                Text(text = "Good Job you have win with a score of $score ")
+                Text(text = "Do you want to restart ?")
+                Button(onClick = {
+                    viewModel.resetGame()
+                    viewModel.start_game()
+                    showWin.value = false
+
+                }) {
+                    Text(text = "Play Again")
+                }
+            }
+
+        },
+        confirmButton = { })
+}
+
+@Composable
+fun AlertDialogLoose(
+    viewModel: GameViewModel,
+    showLoose: MutableState<Boolean>,
+) {
+    AlertDialog(onDismissRequest = { showLoose.value = false },
+        title = { Text(text = "GAME OVER") },
+        text = {
+            Column {
+                Text(text = "Sorry You loose")
+                Text(text = "Do you want to restart ?")
+                Button(onClick = {
+                    viewModel.resetGame()
+                    viewModel.start_game()
+                    showLoose.value = false
+
+                }) {
+                    Text(text = "Play Again")
+                }
+            }
+
+        },
+        confirmButton = { })
+}
+
+@Composable
+fun AlertDialogHints(viewModel: GameViewModel, showHint: MutableState<Boolean>) {
+    AlertDialog(onDismissRequest = { showHint.value = false },
+        title = { Text(text = "GAME OVER") },
+        text = {
+            Column {
+                Text(text = "Sorry You loose")
+                Text(text = "Do you want to restart ?")
+                Button(onClick = {
+                    viewModel.resetGame()
+                    viewModel.start_game()
+                    showHint.value = false
+
+                }) {
+                    Text(text = "Play Again")
+                }
+            }
+
+        },
+        confirmButton = { })
 }
