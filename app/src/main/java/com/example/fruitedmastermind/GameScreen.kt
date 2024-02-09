@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +16,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -221,14 +225,23 @@ fun AlertDialogGuess(
         onDismissRequest = { showDialog.value = false },
         title = { Text(text = "Choose a fruit") },
         text = {
-            Column {
-                for (fruit in viewModel.all_fruits) {
-                    Button(onClick = {
-                        currentGuess.value[selectedCell.value] = fruit
-                        showDialog.value = false
-                    }) {
-                        Text(text = fruit.name)
-                    }
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(3),
+                contentPadding = PaddingValues(20.dp)
+            ) {
+                items(viewModel.all_fruits) { fruit ->
+                    Image(
+                        painter = painterResource(id = fruit.image),
+                        contentDescription = "good place",
+                        modifier = Modifier
+                            .size(90.dp)
+                            .padding(10.dp)
+                            .clickable {
+                                currentGuess.value[selectedCell.value] = fruit
+                                showDialog.value = false
+                            }
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
                 }
             }
         },
