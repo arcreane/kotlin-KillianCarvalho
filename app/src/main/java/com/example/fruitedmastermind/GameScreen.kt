@@ -9,12 +9,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
@@ -162,33 +161,47 @@ fun InputRow(
 
 @Composable
 fun HistoryDisplay(guess_history: List<List<Fruit>>, result_history: List<List<Char>>) {
+    var index = 0
     Column {
         for (guess in guess_history) {
-            Row {
+            Spacer(modifier = Modifier.height(20.dp))
+            History_row(fruit_list = guess, result_list = result_history, index)
+            Spacer(modifier = Modifier.height(20.dp))
+            Divider()
+            index++
+        }
+    }
+}
 
-                for (fruit in guess) {
-                    Image(
-                        painter = painterResource(fruit.image),
-                        contentDescription = "Banane fruits",
-                        modifier = Modifier.size(60.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                }
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .width(1.dp)
-                        .background(Color.Gray)
+@Composable
+fun History_row(fruit_list: List<Fruit>, result_list: List<List<Char>>, index: Int) {
+    Row {
+        for (fruit in fruit_list) {
+            Image(
+                painter = painterResource(fruit.image),
+                contentDescription = "Banane fruits",
+                modifier = Modifier.size(60.dp)
+            )
+        }
+        for (result in result_list[index]) {
+            if (result == '1')
+                Image(
+                    painter = painterResource(id = R.drawable.good_balise),
+                    contentDescription = "good place",
+                    modifier = Modifier.size(25.dp)
                 )
-                for (value in result_history) {
-                    Text(text = value.toString())
-                }
-                Divider(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .width(1.dp)
+            else if (result == '0')
+                Image(
+                    painter = painterResource(id = R.drawable.bad_balise),
+                    contentDescription = "good place",
+                    modifier = Modifier.size(25.dp)
                 )
-            }
+            else
+                Image(
+                    painter = painterResource(id = R.drawable.none_balise),
+                    contentDescription = "good place",
+                    modifier = Modifier.size(25.dp)
+                )
         }
     }
 }
