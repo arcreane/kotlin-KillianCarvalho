@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
@@ -161,14 +163,12 @@ fun InputRow(
 
 @Composable
 fun HistoryDisplay(guess_history: List<List<Fruit>>, result_history: List<List<Char>>) {
-    var index = 0
-    Column {
-        for (guess in guess_history) {
+    LazyColumn {
+        itemsIndexed(guess_history) { index, guess ->
             Spacer(modifier = Modifier.height(20.dp))
             History_row(fruit_list = guess, result_list = result_history, index)
             Spacer(modifier = Modifier.height(20.dp))
             Divider()
-            index++
         }
     }
 }
