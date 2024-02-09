@@ -12,18 +12,33 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,6 +46,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameScreen(viewModel: GameViewModel, navController: NavController) {
     val showDialog = remember { mutableStateOf(false) }
@@ -39,13 +55,56 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
     val remaining_attempts by viewModel.remaining_attempts.observeAsState()
     val guess_history by viewModel.guess_history.observeAsState(emptyList())
     val result_history by viewModel.result_history.observeAsState(emptyList())
+    /* TEST*/
+    var presses by remember { mutableIntStateOf(0) }
 
-    Column {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                colors = topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.primary,
+                ),
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigate("home") }) {
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Retour")
+                    }
+                },
+                title = {
+                    Text("MasterMind")
+                }
+            )
+        },
+        bottomBar = {
+            BottomAppBar(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.primary,
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
 
-        for (fruit in viewModel.combination_to_guess.value!!) {
-            Text(text = fruit.name)
+                ) {
+                    InputRow(viewModel, currentGuess, showDialog, selectedCell)
+
+                }
+            }
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = { presses++ }) {
+                Icon(Icons.Default.Add, contentDescription = "Add")
+            }
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .padding(innerPadding),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            HistoryDisplay(guess_history = guess_history, result_history)
         }
     }
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -59,8 +118,6 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
                 selectedCell = selectedCell
             )
         }
-        InputRow(viewModel, currentGuess, showDialog, selectedCell)
-        HistoryDisplay(guess_history = guess_history, result_history)
     }
 }
 
@@ -89,7 +146,7 @@ fun InputRow(
                 else
                     Image(
                         painter = painterResource(currentGuess.value[i].image),
-                        contentDescription = "Banane fruits",
+                        contentDescription = "${currentGuess.value[i].name}",
                         modifier = Modifier.size(50.dp)
                     )
             }
