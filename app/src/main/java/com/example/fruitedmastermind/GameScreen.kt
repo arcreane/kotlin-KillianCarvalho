@@ -58,12 +58,14 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
     val showDialog = remember { mutableStateOf(false) }
     val showWin = remember { mutableStateOf(false) }
     val showLoose = remember { mutableStateOf(false) }
+    var showHints by remember { mutableStateOf(false) }
+
     val selectedCell = remember { mutableStateOf(0) }
     val currentGuess = remember { mutableStateOf(MutableList(4) { Fruit("", false, false, 0) }) }
+
     val remainingAttempts by viewModel.remaining_attempts.observeAsState()
     val guessHistory by viewModel.guess_history.observeAsState(emptyList())
     val resultHistory by viewModel.result_history.observeAsState(emptyList())
-    var showMenu by remember { mutableStateOf(false) }
     val has_win by viewModel.win.observeAsState()
     val score by viewModel.score.observeAsState()
 
@@ -98,12 +100,12 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
         },
         floatingActionButton = {
             Column {
-                FloatingActionButton(onClick = { showMenu = true }) {
+                FloatingActionButton(onClick = { showHints = true }) {
                     Icon(Icons.Default.Add, contentDescription = "Add")
                 }
                 DropdownMenu(
-                    expanded = showMenu,
-                    onDismissRequest = { showMenu = false },
+                    expanded = showHints,
+                    onDismissRequest = { showHints = false },
 
                     ) {
                     DropdownMenuItem(text = { Text("First hint -2 attempts") },
@@ -115,14 +117,7 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
 
         },
     ) { innerPadding ->
-        if (remainingAttempts!! <= 0) {
-            AlertDialogLoose(viewModel = viewModel, showLoose = showLoose)
-        }
-        if (has_win == true) AlertDialogWin(
-            viewModel = viewModel,
-            showWin = showWin,
-            score = score
-        )
+
         Column(
             modifier = Modifier.padding(innerPadding),
             verticalArrangement = Arrangement.Top,
@@ -142,6 +137,14 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        if (remainingAttempts!! <= 0) {
+            AlertDialogLoose(viewModel = viewModel, showLoose = showLoose)
+        }
+        if (has_win == true) AlertDialogWin(
+            viewModel = viewModel,
+            showWin = showWin,
+            score = score
+        )
         if (showDialog.value) {
             AlertDialogGuess(
                 viewModel = viewModel,
@@ -307,28 +310,6 @@ fun AlertDialogLoose(
                     viewModel.resetGame()
                     viewModel.start_game()
                     showLoose.value = false
-
-                }) {
-                    Text(text = "Play Again")
-                }
-            }
-
-        },
-        confirmButton = { })
-}
-
-@Composable
-fun AlertDialogHints(viewModel: GameViewModel, showHint: MutableState<Boolean>) {
-    AlertDialog(onDismissRequest = { showHint.value = false },
-        title = { Text(text = "GAME OVER") },
-        text = {
-            Column {
-                Text(text = "Sorry You loose")
-                Text(text = "Do you want to restart ?")
-                Button(onClick = {
-                    viewModel.resetGame()
-                    viewModel.start_game()
-                    showHint.value = false
 
                 }) {
                     Text(text = "Play Again")

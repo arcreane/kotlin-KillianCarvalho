@@ -34,13 +34,12 @@ fun Home_screen(viewModel: GameViewModel, nav_controller: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Button(
-//                colors = ButtonDefaults.buttonColors(Color.Red),
                 onClick = {
                     viewModel.resetGame()
                     viewModel.start_game()
                     nav_controller.navigate("game")
                 }) {
-                Text(text = "Commencer le jeu")
+                Text(text = "Play")
             }
         }
     }
