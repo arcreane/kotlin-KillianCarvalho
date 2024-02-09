@@ -53,9 +53,9 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
     val showDialog = remember { mutableStateOf(false) }
     val selectedCell = remember { mutableStateOf(0) }
     val currentGuess = remember { mutableStateOf(MutableList(4) { Fruit("", false, false, 0) }) }
-    val remaining_attempts by viewModel.remaining_attempts.observeAsState()
-    val guess_history by viewModel.guess_history.observeAsState(emptyList())
-    val result_history by viewModel.result_history.observeAsState(emptyList())
+    val remainingAttempts by viewModel.remaining_attempts.observeAsState()
+    val guessHistory by viewModel.guess_history.observeAsState(emptyList())
+    val resultHistory by viewModel.result_history.observeAsState(emptyList())
 
     var presses by remember { mutableIntStateOf(0) }
 
@@ -102,7 +102,7 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
                 .padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            HistoryDisplay(guess_history = guess_history, result_history)
+            HistoryDisplay(guessHistory = guessHistory, resultHistory)
         }
     }
 
@@ -112,7 +112,7 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (showDialog.value) {
-            Alert_dialog_guess(
+            AlertDialogGuess(
                 viewModel = viewModel,
                 currentGuess = currentGuess,
                 showDialog = showDialog,
@@ -122,6 +122,7 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
     }
 }
 
+// composable to manage the choice of the user
 @Composable
 fun InputRow(
     viewModel: GameViewModel,
@@ -147,7 +148,7 @@ fun InputRow(
                 else
                     Image(
                         painter = painterResource(currentGuess.value[i].image),
-                        contentDescription = "${currentGuess.value[i].name}",
+                        contentDescription = currentGuess.value[i].name,
                         modifier = Modifier.size(50.dp)
                     )
             }
@@ -161,29 +162,31 @@ fun InputRow(
     }
 }
 
+// Composable to manage list history
 @Composable
-fun HistoryDisplay(guess_history: List<List<Fruit>>, result_history: List<List<Char>>) {
+fun HistoryDisplay(guessHistory: List<List<Fruit>>, resultHistory: List<List<Char>>) {
     LazyColumn {
-        itemsIndexed(guess_history) { index, guess ->
+        itemsIndexed(guessHistory) { index, guess ->
             Spacer(modifier = Modifier.height(20.dp))
-            History_row(fruit_list = guess, result_list = result_history, index)
+            HistoryRow(fruitList = guess, resultList = resultHistory, index)
             Spacer(modifier = Modifier.height(20.dp))
             Divider()
         }
     }
 }
 
+// Composable to manage one row history
 @Composable
-fun History_row(fruit_list: List<Fruit>, result_list: List<List<Char>>, index: Int) {
+fun HistoryRow(fruitList: List<Fruit>, resultList: List<List<Char>>, index: Int) {
     Row {
-        for (fruit in fruit_list) {
+        for (fruit in fruitList) {
             Image(
                 painter = painterResource(fruit.image),
                 contentDescription = "Banane fruits",
                 modifier = Modifier.size(60.dp)
             )
         }
-        for (result in result_list[index]) {
+        for (result in resultList[index]) {
             if (result == '1')
                 Image(
                     painter = painterResource(id = R.drawable.good_balise),
@@ -206,8 +209,9 @@ fun History_row(fruit_list: List<Fruit>, result_list: List<List<Char>>, index: I
     }
 }
 
+// Composable to manage dialog guess which let appears the fruits list for the user
 @Composable
-fun Alert_dialog_guess(
+fun AlertDialogGuess(
     viewModel: GameViewModel,
     currentGuess: MutableState<MutableList<Fruit>>,
     showDialog: MutableState<Boolean>,
@@ -215,7 +219,7 @@ fun Alert_dialog_guess(
 ) {
     AlertDialog(
         onDismissRequest = { showDialog.value = false },
-        title = { Text(text = "Cellule ${selectedCell.value}") },
+        title = { Text(text = "Choose a fruit") },
         text = {
             Column {
                 for (fruit in viewModel.all_fruits) {
@@ -223,7 +227,7 @@ fun Alert_dialog_guess(
                         currentGuess.value[selectedCell.value] = fruit
                         showDialog.value = false
                     }) {
-                        Text(text = "${fruit.name}")
+                        Text(text = fruit.name)
                     }
                 }
             }
