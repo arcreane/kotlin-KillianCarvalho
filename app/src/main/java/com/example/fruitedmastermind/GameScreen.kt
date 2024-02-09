@@ -55,7 +55,7 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
     val remaining_attempts by viewModel.remaining_attempts.observeAsState()
     val guess_history by viewModel.guess_history.observeAsState(emptyList())
     val result_history by viewModel.result_history.observeAsState(emptyList())
-    /* TEST*/
+
     var presses by remember { mutableIntStateOf(0) }
 
     Scaffold(

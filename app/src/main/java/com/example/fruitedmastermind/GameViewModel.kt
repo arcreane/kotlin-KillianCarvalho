@@ -89,4 +89,13 @@ class GameViewModel : ViewModel() {
         }
         return result_proposition
     }
+
+    fun resetGame() {
+        _combination_to_guess.value = emptyList()
+        _current_guess.value = emptyList()
+        _remaining_attempts.value = 10
+        _score.value = 0
+        _guess_history.value = emptyList()
+        _result_history.value = emptyList()
+    }
 }
