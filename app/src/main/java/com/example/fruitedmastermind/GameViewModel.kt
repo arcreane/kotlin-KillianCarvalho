@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 
 class GameViewModel : ViewModel() {
     // list of all fruits
-    private val _all_fruits = listOf(
+    private val _allFruits = listOf(
         Fruit("banana", false, true, R.drawable.banana),
         Fruit("grape", true, false, R.drawable.grape),
         Fruit("kiwi", false, true, R.drawable.kiwi),
@@ -16,38 +16,38 @@ class GameViewModel : ViewModel() {
         Fruit("raspberry", false, false, R.drawable.raspberry),
         Fruit("strawberry", false, false, R.drawable.strawberry),
     )
-    val all_fruits: List<Fruit> = _all_fruits
+    val allFruits: List<Fruit> = _allFruits
 
     // combination of fruits to guess
-    private val _combination_to_guess = MutableLiveData<List<Fruit>>()
-    val combination_to_guess: LiveData<List<Fruit>> = _combination_to_guess
+    private val _combinationToGuess = MutableLiveData<List<Fruit>>()
+    val combinationToGuess: LiveData<List<Fruit>> = _combinationToGuess
 
     // user's guesses
-    private val _current_guess = MutableLiveData<List<Fruit>>()
-    val current_guess: LiveData<List<Fruit>> = _current_guess
+    private val _currentGuess = MutableLiveData<List<Fruit>>()
+    val currentGuess: LiveData<List<Fruit>> = _currentGuess
 
     // number of trials left
-    private val _remaining_attempts = MutableLiveData<Int>()
-    val remaining_attempts = _remaining_attempts
+    private val _remainingAttempts = MutableLiveData<Int>()
+    val remainingAttempts = _remainingAttempts
 
     // current score
     private val _score = MutableLiveData<Int>()
     val score = _score
 
     // combination history
-    private val _guess_history = MutableLiveData<List<List<Fruit>>>(emptyList())
-    val guess_history = _guess_history
+    private val _guessHistory = MutableLiveData<List<List<Fruit>>>(emptyList())
+    val guessHistory = _guessHistory
 
     // combination result history
-    private val _result_history = MutableLiveData<List<List<Char>>>(emptyList())
-    val result_history = _result_history
+    private val _resultHistory = MutableLiveData<List<List<Char>>>(emptyList())
+    val resultHistory = _resultHistory
 
     private val _win = MutableLiveData<Boolean>()
     val win = _win
 
     fun start_game(){
-        _combination_to_guess.value = set_combination(_all_fruits)
-        _remaining_attempts.value = 10
+        _combinationToGuess.value = set_combination(_allFruits)
+        _remainingAttempts.value = 10
         _score.value = 0
     }
 
@@ -56,25 +56,25 @@ class GameViewModel : ViewModel() {
         var answer_check = check_combination(guess)
 
         // keep the history
-        _guess_history.value = _guess_history.value?.plus(listOf(guess))
-        _result_history.value = _result_history.value?.plus(listOf(answer_check))
+        _guessHistory.value = _guessHistory.value?.plus(listOf(guess))
+        _resultHistory.value = _resultHistory.value?.plus(listOf(answer_check))
 
         // left one attempts to the user
-        _remaining_attempts.value = (_remaining_attempts.value ?: 0) -1
+        _remainingAttempts.value = (_remainingAttempts.value ?: 0) -1
 
         // if all the value is '1' the game is end and we ask to play again
         if (answer_check.all {it == '1'}){
-            _score.value = _remaining_attempts.value
+            _score.value = _remainingAttempts.value
             _win.value = true
         }
     }
 
     // give hint link to the seeds variable
     fun giveFirstHint(): List<Boolean> {
-        val combination = _combination_to_guess.value ?: emptyList()
-        _remaining_attempts.value = _remaining_attempts.value!! - 2
+        val combination = _combinationToGuess.value ?: emptyList()
+        _remainingAttempts.value = _remainingAttempts.value!! - 2
         return combination.map { fruit ->
-            if (fruit.has_seeds) {
+            if (fruit.hasSeeds) {
                 true
             } else {
                 false
@@ -84,11 +84,11 @@ class GameViewModel : ViewModel() {
 
     // give hint link to the peelable variable
     fun giveSecondHint(): List<Boolean> {
-        val combination = _combination_to_guess.value ?: emptyList()
-        _remaining_attempts.value = _remaining_attempts.value!! - 3
+        val combination = _combinationToGuess.value ?: emptyList()
+        _remainingAttempts.value = _remainingAttempts.value!! - 3
 
         return combination.map { fruit ->
-            if (fruit.is_peelable) {
+            if (fruit.isPeelable) {
                 true
             } else {
                 false
@@ -101,33 +101,33 @@ class GameViewModel : ViewModel() {
 
         return combination
     }
-    fun check_combination(user_combination: List<Fruit>): MutableList<Char>
+    fun check_combination(userCombination: List<Fruit>): MutableList<Char>
     {
-        val result_proposition = mutableListOf<Char>()
-        val correct_combination = _combination_to_guess.value ?: emptyList()
+        val resultProposition = mutableListOf<Char>()
+        val correctCombination = _combinationToGuess.value ?: emptyList()
 
         // loop with index and fruit to check information more rapidly
-        for ((index, fruit) in user_combination.withIndex())
+        for ((index, fruit) in userCombination.withIndex())
         {
-            if (fruit !in correct_combination)
-                result_proposition.add('X')
+            if (fruit !in correctCombination)
+                resultProposition.add('X')
             else
             {
-                if (correct_combination[index] == fruit)
-                    result_proposition.add('1')
+                if (correctCombination[index] == fruit)
+                    resultProposition.add('1')
                 else
-                    result_proposition.add('0')
+                    resultProposition.add('0')
             }
         }
-        return result_proposition
+        return resultProposition
     }
 
     fun resetGame() {
-        _combination_to_guess.value = emptyList()
-        _current_guess.value = emptyList()
-        _remaining_attempts.value = 10
+        _combinationToGuess.value = emptyList()
+        _currentGuess.value = emptyList()
+        _remainingAttempts.value = 10
         _score.value = 0
-        _guess_history.value = emptyList()
-        _result_history.value = emptyList()
+        _guessHistory.value = emptyList()
+        _resultHistory.value = emptyList()
     }
 }

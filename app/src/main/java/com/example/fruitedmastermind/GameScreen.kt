@@ -63,9 +63,9 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
     val selectedCell = remember { mutableStateOf(0) }
     val currentGuess = remember { mutableStateOf(MutableList(4) { Fruit("", false, false, 0) }) }
 
-    val remainingAttempts by viewModel.remaining_attempts.observeAsState()
-    val guessHistory by viewModel.guess_history.observeAsState(emptyList())
-    val resultHistory by viewModel.result_history.observeAsState(emptyList())
+    val remainingAttempts by viewModel.remainingAttempts.observeAsState()
+    val guessHistory by viewModel.guessHistory.observeAsState(emptyList())
+    val resultHistory by viewModel.resultHistory.observeAsState(emptyList())
     val has_win by viewModel.win.observeAsState()
     val score by viewModel.score.observeAsState()
 
@@ -252,7 +252,7 @@ fun AlertDialogGuess(
             LazyVerticalGrid(
                 columns = GridCells.Fixed(3), contentPadding = PaddingValues(20.dp)
             ) {
-                items(viewModel.all_fruits) { fruit ->
+                items(viewModel.allFruits) { fruit ->
                     Image(painter = painterResource(id = fruit.image),
                         contentDescription = "good place",
                         modifier = Modifier

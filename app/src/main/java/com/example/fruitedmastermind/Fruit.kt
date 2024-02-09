@@ -1,3 +1,3 @@
 package com.example.fruitedmastermind
 
-data class Fruit(val name:String, val has_seeds: Boolean, val is_peelable: Boolean, val image: Int )
+data class Fruit(val name:String, val hasSeeds: Boolean, val isPeelable: Boolean, val image: Int )
